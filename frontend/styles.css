@@ -1,0 +1,292 @@
+:root {
+  --bg: #0b0d12;
+  --panel: #12151c;
+  --border: #232733;
+  --text: #e7e9ee;
+  --muted: #8b93a7;
+  --accent: #6ea8fe;
+  --fresh: #35c56a;
+  --suspect: #e8b339;
+  --broken: #e5484d;
+  --unverified: #5c6270;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, "Segoe UI", Roboto, Inter, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.45;
+}
+
+header {
+  padding: 2.2rem 1.5rem 1rem;
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.75rem;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+h1 {
+  font-size: 1.6rem;
+  margin: 0.35rem 0 0;
+  font-weight: 600;
+}
+
+main {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 0 1.5rem 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+.intake form {
+  display: flex;
+  gap: 0.6rem;
+}
+
+#url-input {
+  flex: 1;
+  background: #0e1117;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  padding: 0.65rem 0.8rem;
+  font-size: 0.95rem;
+}
+
+#url-input:focus { outline: 2px solid var(--accent); }
+
+button, .button-link {
+  background: var(--accent);
+  color: #04101f;
+  border: none;
+  border-radius: 8px;
+  padding: 0.65rem 1rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+button:disabled { opacity: 0.55; cursor: progress; }
+
+button.ghost {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.hint {
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin: 0.75rem 0 0;
+}
+
+.status {
+  margin-top: 0.9rem;
+  padding: 0.7rem 0.85rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  font-size: 0.88rem;
+}
+
+.status.error { border-color: var(--broken); color: #ffb3b5; }
+.status.ok { border-color: var(--fresh); color: #bdf0d0; }
+.status.working { border-color: var(--accent); color: #cfe2ff; }
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.6rem;
+}
+
+.panel-header h2 { margin: 0; font-size: 1rem; }
+
+.sites-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.site-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.87rem;
+}
+
+.site-row:hover { border-color: var(--accent); }
+.site-row .muted { color: var(--muted); font-size: 0.8rem; }
+
+.empty { color: var(--muted); font-size: 0.85rem; padding: 0.5rem 0; }
+
+.result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.result-header h2 { margin: 0; font-size: 1.15rem; }
+.muted { color: var(--muted); }
+
+.result-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.coverage-row {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin: 1rem 0;
+}
+
+.stat {
+  background: #0e1117;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.5rem 0.8rem;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.stat b { color: var(--text); font-size: 1rem; display: block; }
+
+.graph-flows {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 1.25rem;
+}
+
+@media (max-width: 820px) {
+  .graph-flows { grid-template-columns: 1fr; }
+}
+
+.graph-wrap {
+  position: relative;
+  background: #0e1117;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+#graph-svg { width: 100%; height: 560px; display: block; }
+
+.legend {
+  position: absolute;
+  bottom: 0.6rem;
+  left: 0.6rem;
+  right: 0.6rem;
+  display: flex;
+  gap: 0.9rem;
+  flex-wrap: wrap;
+  font-size: 0.72rem;
+  color: var(--muted);
+  background: rgba(11, 13, 18, 0.75);
+  padding: 0.4rem 0.6rem;
+  border-radius: 8px;
+}
+
+.legend .dot {
+  display: inline-block;
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  margin-right: 4px;
+  vertical-align: middle;
+}
+.dot.fresh { background: var(--fresh); }
+.dot.suspect { background: var(--suspect); }
+.dot.broken { background: var(--broken); }
+.dot.unverified { background: var(--unverified); }
+
+.legend .line {
+  display: inline-block;
+  width: 16px; height: 0;
+  border-top: 2px solid var(--muted);
+  margin-right: 4px;
+  vertical-align: middle;
+}
+.line.write { border-top-style: dashed; }
+.line.destructive { border-top-style: dotted; border-color: var(--broken); }
+.legend .sep { width: 1px; background: var(--border); }
+
+.flows-wrap h3 { margin: 0 0 0.6rem; font-size: 0.95rem; }
+
+.flows-list { display: flex; flex-direction: column; gap: 0.55rem; }
+
+.flow-card {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.6rem 0.75rem;
+  background: #0e1117;
+}
+
+.flow-card .flow-name {
+  font-weight: 600;
+  font-size: 0.88rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.badge {
+  font-size: 0.68rem;
+  padding: 0.12rem 0.45rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.badge.fresh { color: var(--fresh); border-color: var(--fresh); }
+.badge.suspect { color: var(--suspect); border-color: var(--suspect); }
+.badge.broken { color: var(--broken); border-color: var(--broken); }
+.badge.unverified { color: var(--unverified); border-color: var(--unverified); }
+
+.flow-card p { margin: 0.3rem 0 0; font-size: 0.78rem; color: var(--muted); }
+.flow-card .steps { margin-top: 0.4rem; font-size: 0.76rem; color: var(--muted); }
+.flow-card .steps div { padding: 0.1rem 0; }
+
+footer {
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.78rem;
+  padding: 1.5rem;
+}
+
+.node-label {
+  fill: var(--text);
+  font-size: 10px;
+  pointer-events: none;
+}
+
+.node-circle { stroke: #0b0d12; stroke-width: 2px; cursor: grab; }

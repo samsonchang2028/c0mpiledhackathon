@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Wayfinder</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <span class="eyebrow">Wayfinder</span>
+      <h1>Paste a link. Get a continuously updated graph an agent can navigate seamlessly.</h1>
+    </div>
+  </header>
+
+  <main>
+    <section class="panel intake">
+      <form id="explore-form">
+        <input
+          id="url-input"
+          type="url"
+          placeholder="https://example.com"
+          required
+          autocomplete="off"
+        >
+        <button id="explore-button" type="submit">Dig</button>
+      </form>
+      <p class="hint">
+        Wayfinder drives a real browser, discovers states and actions, and only ever
+        <em>clicks</em> read/navigation actions during exploration &mdash; forms and submit
+        buttons are recorded structurally, never executed, until verified against a sandbox.
+      </p>
+      <div id="status" class="status" hidden></div>
+    </section>
+
+    <section class="panel known-sites">
+      <div class="panel-header">
+        <h2>Known sites</h2>
+        <button id="refresh-sites" type="button" class="ghost">Refresh</button>
+      </div>
+      <div id="sites-list" class="sites-list"></div>
+    </section>
+
+    <section id="result" class="result" hidden>
+      <div class="result-header">
+        <div>
+          <h2 id="result-title"></h2>
+          <p id="result-subtitle" class="muted"></p>
+        </div>
+        <div class="result-actions">
+          <button id="verify-button" type="button">Verify now</button>
+          <a id="download-md" class="button-link" download>Download guide (.md)</a>
+          <a id="download-json" class="button-link" download>Download manifest (.json)</a>
+        </div>
+      </div>
+
+      <div class="coverage-row" id="coverage-row"></div>
+
+      <div class="graph-flows">
+        <div class="graph-wrap">
+          <svg id="graph-svg" viewBox="0 0 900 560" preserveAspectRatio="xMidYMid meet"></svg>
+          <div class="legend">
+            <span><i class="dot fresh"></i> fresh</span>
+            <span><i class="dot suspect"></i> suspect</span>
+            <span><i class="dot broken"></i> broken</span>
+            <span><i class="dot unverified"></i> unverified</span>
+            <span class="sep"></span>
+            <span><i class="line read"></i> read</span>
+            <span><i class="line write"></i> write</span>
+            <span><i class="line destructive"></i> destructive</span>
+          </div>
+        </div>
+
+        <div class="flows-wrap">
+          <h3>Flows</h3>
+          <div id="flows-list" class="flows-list"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Explore &rarr; verify &rarr; self-heal &rarr; serve. Nothing here executes a write or destructive action to map it.</p>
+  </footer>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
