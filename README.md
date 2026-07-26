@@ -1,16 +1,16 @@
-# Skill Graph Demo API
+# Skill Graph Demo
 
-This repository combines the local target app, replay runtime, and demo-facing FastAPI surface.
+This project runs stored browser workflows against a local test site through a
+FastAPI API. The test site has two versions:
 
-Worktree 3 owns only the API layer and fallback adapter. It calls Worktree 2 directly through:
+- **v1** is the baseline UI.
+- **v2** changes the UI labels and selectors to demonstrate automatic repair.
 
-```python
-replay.run_skill(name, payload, site_url)
-```
+The site is static and does not save submitted data.
 
-It does not implement the target website, graph storage, Playwright replay, or repair internals.
+## 1. Setup
 
-## Setup
+From the repository root:
 
 ```powershell
 python -m venv .venv
@@ -19,66 +19,38 @@ python -m pip install -r requirements.txt
 python -m playwright install chromium
 ```
 
-## Target App
+## 2. Start the test site
 
-Start the Worktree 1 target app in a separate terminal:
+Open a second terminal:
 
 ```powershell
 cd target
 python -m http.server 4173
 ```
 
-Target URLs:
+Leave this terminal running. You can inspect either site version in a browser:
 
-- Baseline: `http://localhost:4173/?version=v1`
-- Drift: `http://localhost:4173/?version=v2`
+- v1: <http://localhost:4173/?version=v1>
+- v2: <http://localhost:4173/?version=v2>
 
-## API Configuration
+## 3. Start the API
+
+In the original terminal, choose the target version and start FastAPI:
 
 ```powershell
 $env:TARGET_SITE_URL = "http://localhost:4173/?version=v1"
 $env:FALLBACK_PROVIDER = "mock"
-```
-
-- `TARGET_SITE_URL` defaults to `http://localhost:4173/?version=v1`.
-- Set `TARGET_SITE_URL` to `http://localhost:4173/?version=v2` for the drift demo.
-- `FALLBACK_PROVIDER` defaults to `mock` and makes no outbound calls.
-- No auth is required for the local demo API.
-
-## Run API
-
-```powershell
 uvicorn server:app --reload --host 127.0.0.1 --port 8000
 ```
 
-## Routes
+The API is now available at <http://127.0.0.1:8000>. Interactive Swagger
+documentation is available at <http://127.0.0.1:8000/docs>.
 
-### `POST /skills/book_appointment`
+No authentication or external credentials are required.
 
-```json
-{
-  "customer_name": "Sam Kim",
-  "service": "Consultation",
-  "date": "2026-07-26",
-  "time": "09:00"
-}
-```
+## 4. Call the API
 
-### `POST /skills/request_quote`
-
-```json
-{
-  "company": "Compiled Hackathon",
-  "category": "New installation",
-  "notes": "Need a quote for a demo workflow repair project."
-}
-```
-
-### `POST /skills/{name}`
-
-`name` must be `book_appointment` or `request_quote`. This route accepts a raw JSON object and passes it through to `replay.run_skill`.
-
-## Example Curl
+Open a third terminal and book an appointment:
 
 ```powershell
 curl.exe -X POST http://127.0.0.1:8000/skills/book_appointment `
@@ -86,24 +58,45 @@ curl.exe -X POST http://127.0.0.1:8000/skills/book_appointment `
   -d '{ "customer_name": "Sam Kim", "service": "Consultation", "date": "2026-07-26", "time": "09:00" }'
 ```
 
+Or request a quote:
+
 ```powershell
 curl.exe -X POST http://127.0.0.1:8000/skills/request_quote `
   -H "Content-Type: application/json" `
   -d '{ "company": "Compiled Hackathon", "category": "New installation", "notes": "Need a quote for a demo workflow repair project." }'
 ```
 
-## Fallback Behavior
+Successful responses contain:
 
-The server calls `replay.run_skill(name, payload, site_url)` first. If the runtime report has `fallback_needed: true`, has `status: "fallback"`, and has not already marked `fallback_used: true`, the server invokes the fallback adapter.
+- `"status": "success"`
+- `"visited_edges"` showing each completed browser action
+- `"repairs_attempted": 0` when the stored selectors still work
 
-The default mock adapter returns a stable `fallback_result` with:
+## 5. Demonstrate UI repair
 
-- `provider`
-- `status`
-- `ticket_id`
-- `skill_name`
-- `site_url`
-- `message`
-- `provider_payload`
+1. Stop the API with `Ctrl+C`.
+2. Restart it against v2:
 
-No credentials or outbound network calls are required for the mock fallback.
+```powershell
+$env:TARGET_SITE_URL = "http://localhost:4173/?version=v2"
+uvicorn server:app --reload --host 127.0.0.1 --port 8000
+```
+
+3. Repeat either API request above.
+
+The response should still have `"status": "success"`, but
+`"repairs_attempted"` will be greater than zero and `"repair_outcomes"` will
+show the replacement selectors. Successful repairs are written to
+`graph.json`, so later calls may not need to repair the same edges again.
+
+If an action cannot be repaired, the API uses the local mock fallback and
+returns `"status": "fallback"` with `"fallback_used": true`.
+
+## API routes
+
+- `POST /skills/book_appointment`
+- `POST /skills/request_quote`
+- `POST /skills/{name}`, where `name` is one of the two skill names above
+
+The API calls `replay.run_skill(name, payload, site_url)` and returns its
+execution report.
