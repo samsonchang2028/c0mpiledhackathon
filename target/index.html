@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Northstar Operations</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <div>
+      <span class="eyebrow">Northstar Services</span>
+      <h1>Operations desk</h1>
+    </div>
+    <nav aria-label="Demo version">
+      <a id="version-v1" href="?version=v1">v1</a>
+      <a id="version-v2" href="?version=v2">v2</a>
+    </nav>
+  </header>
+
+  <main>
+    <aside>
+      <p class="eyebrow">Workflows</p>
+      <div id="workflow-nav"></div>
+      <p class="version-note">Active interface: <strong id="active-version"></strong></p>
+    </aside>
+    <section id="workspace" aria-live="polite"></section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

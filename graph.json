@@ -1,0 +1,816 @@
+{
+  "schema_version": "1.0",
+  "schema": {
+    "nodes": {
+      "shape": "object keyed by node id",
+      "required_fields": [
+        "id",
+        "kind",
+        "description"
+      ],
+      "fields": {
+        "id": "Stable node id.",
+        "kind": "Logical node type, usually page, form, or state.",
+        "description": "Human-readable UI state description.",
+        "url_path": "Optional expected URL path or route hint."
+      }
+    },
+    "edges": {
+      "shape": "object keyed by edge id",
+      "required_fields": [
+        "id",
+        "from_node",
+        "to_node",
+        "target_description",
+        "selector",
+        "action",
+        "postcondition",
+        "status",
+        "last_checked"
+      ],
+      "fields": {
+        "selector": "Primary selector metadata. strategy can be css, role, label, placeholder, text, or test_id. original stores the initial selector strategy.",
+        "relocation": "Structured self-heal hints: roles, names, labels, placeholders, text, test_ids, and alternate_selectors.",
+        "action": "Action metadata. type can be click, fill, select, or verify. payload_key binds a payload field for fill/select actions.",
+        "postcondition": "Expected state after the action. type can be none, action_completed, action_target_has_value, selector_visible, any_selector_visible, text_visible, or url_contains.",
+        "status": "verified, stale, or broken.",
+        "last_checked": "UTC ISO-8601 timestamp, or null before first successful verification.",
+        "last_error": "Latest execution or verification error, if any."
+      }
+    },
+    "skills": {
+      "shape": "object keyed by public skill name",
+      "required_fields": [
+        "name",
+        "description",
+        "payload_schema",
+        "edges"
+      ],
+      "fields": {
+        "payload_schema": "Small JSON-schema-like contract used by replay.py for required string fields and unknown-field rejection.",
+        "edges": "Ordered edge ids executed for this skill.",
+        "success": "Skill-level success metadata used for the runtime result."
+      }
+    }
+  },
+  "nodes": {
+    "home": {
+      "id": "home",
+      "kind": "page",
+      "description": "Main operations screen.",
+      "url_path": "/"
+    },
+    "booking_form": {
+      "id": "booking_form",
+      "kind": "form",
+      "description": "Appointment booking form."
+    },
+    "booking_confirmation": {
+      "id": "booking_confirmation",
+      "kind": "state",
+      "description": "Appointment confirmation state."
+    },
+    "quote_form": {
+      "id": "quote_form",
+      "kind": "form",
+      "description": "Quote request form."
+    },
+    "quote_confirmation": {
+      "id": "quote_confirmation",
+      "kind": "state",
+      "description": "Quote request confirmation state."
+    }
+  },
+  "edges": {
+    "book.open_booking": {
+      "id": "book.open_booking",
+      "from_node": "home",
+      "to_node": "booking_form",
+      "target_description": "Open the appointment booking workflow.",
+      "selector": {
+        "strategy": "css",
+        "value": "#booking-nav",
+        "original": {
+          "strategy": "css",
+          "value": "#booking-nav"
+        }
+      },
+      "relocation": {
+        "roles": [
+          "button",
+          "link"
+        ],
+        "names": [
+          "Book appointment",
+          "Schedule visit",
+          "Booking",
+          "Appointments"
+        ],
+        "text": [
+          "Book appointment",
+          "Schedule visit"
+        ],
+        "test_ids": [
+          "booking-nav",
+          "schedule-nav"
+        ],
+        "alternate_selectors": [
+          {
+            "strategy": "css",
+            "value": "#schedule-nav"
+          },
+          {
+            "strategy": "css",
+            "value": "[data-skill='book_appointment']"
+          },
+          {
+            "strategy": "css",
+            "value": "[data-action='book-appointment']"
+          }
+        ]
+      },
+      "action": {
+        "type": "click"
+      },
+      "postcondition": {
+        "type": "any_selector_visible",
+        "selectors": [
+          {
+            "strategy": "css",
+            "value": "#booking-form"
+          },
+          {
+            "strategy": "css",
+            "value": "[data-flow='booking']"
+          },
+          {
+            "strategy": "label",
+            "value": "Customer name",
+            "exact": false
+          },
+          {
+            "strategy": "label",
+            "value": "Client name",
+            "exact": false
+          }
+        ]
+      },
+      "status": "stale",
+      "last_checked": null,
+      "last_error": null
+    },
+    "book.fill_customer_name": {
+      "id": "book.fill_customer_name",
+      "from_node": "booking_form",
+      "to_node": "booking_form",
+      "target_description": "Fill the booking customer name field.",
+      "selector": {
+        "strategy": "css",
+        "value": "#customer-name",
+        "original": {
+          "strategy": "css",
+          "value": "#customer-name"
+        }
+      },
+      "relocation": {
+        "labels": [
+          "Customer name",
+          "Client name",
+          "Name"
+        ],
+        "placeholders": [
+          "Customer name",
+          "Client name",
+          "Name"
+        ],
+        "test_ids": [
+          "customer-name",
+          "visitor-name"
+        ],
+        "alternate_selectors": [
+          {
+            "strategy": "css",
+            "value": "#visitor-name"
+          },
+          {
+            "strategy": "css",
+            "value": "input[name='visitor-name']"
+          }
+        ]
+      },
+      "action": {
+        "type": "fill",
+        "payload_key": "customer_name"
+      },
+      "postcondition": {
+        "type": "action_target_has_value",
+        "payload_key": "customer_name"
+      },
+      "status": "stale",
+      "last_checked": null,
+      "last_error": null
+    },
+    "book.choose_service": {
+      "id": "book.choose_service",
+      "from_node": "booking_form",
+      "to_node": "booking_form",
+      "target_description": "Choose the appointment service.",
+      "selector": {
+        "strategy": "css",
+        "value": "#service",
+        "original": {
+          "strategy": "css",
+          "value": "#service"
+        }
+      },
+      "relocation": {
+        "labels": [
+          "Service",
+          "Visit type",
+          "Appointment type"
+        ],
+        "placeholders": [
+          "Service",
+          "Offering",
+          "Appointment type"
+        ],
+        "test_ids": [
+          "service",
+          "visit-type"
+        ],
+        "alternate_selectors": [
+          {
+            "strategy": "css",
+            "value": "#visit-type"
+          },
+          {
+            "strategy": "css",
+            "value": "select[name='visit-type']"
+          }
+        ]
+      },
+      "action": {
+        "type": "select",
+        "payload_key": "service"
+      },
+      "postcondition": {
+        "type": "action_completed"
+      },
+      "status": "stale",
+      "last_checked": null,
+      "last_error": null
+    },
+    "book.choose_date": {
+      "id": "book.choose_date",
+      "from_node": "booking_form",
+      "to_node": "booking_form",
+      "target_description": "Fill the appointment date.",
+      "selector": {
+        "strategy": "css",
+        "value": "#appointment-date",
+        "original": {
+          "strategy": "css",
+          "value": "#appointment-date"
+        }
+      },
+      "relocation": {
+        "labels": [
+          "Date",
+          "Appointment date",
+          "Preferred day"
+        ],
+        "placeholders": [
+          "YYYY-MM-DD",
+          "Date",
+          "Appointment date"
+        ],
+        "test_ids": [
+          "appointment-date",
+          "visit-date"
+        ],
+        "alternate_selectors": [
+          {
+            "strategy": "css",
+            "value": "#visit-date"
+          },
+          {
+            "strategy": "css",
+            "value": "input[name='visit-date']"
+          }
+        ]
+      },
+      "action": {
+        "type": "fill",
+        "payload_key": "date"
+      },
+      "postcondition": {
+        "type": "action_target_has_value",
+        "payload_key": "date"
+      },
+      "status": "stale",
+      "last_checked": null,
+      "last_error": null
+    },
+    "book.choose_time": {
+      "id": "book.choose_time",
+      "from_node": "booking_form",
+      "to_node": "booking_form",
+      "target_description": "Fill the appointment time.",
+      "selector": {
+        "strategy": "css",
+        "value": "#appointment-time",
+        "original": {
+          "strategy": "css",
+          "value": "#appointment-time"
+        }
+      },
+      "relocation": {
+        "labels": [
+          "Time",
+          "Appointment time",
+          "Arrival window"
+        ],
+        "placeholders": [
+          "HH:MM",
+          "Time",
+          "Appointment time"
+        ],
+        "test_ids": [
+          "appointment-time",
+          "visit-window"
+        ],
+        "alternate_selectors": [
+          {
+            "strategy": "css",
+            "value": "#visit-window"
+          },
+          {
+            "strategy": "css",
+            "value": "select[name='visit-window']"
+          }
+        ]
+      },
+      "action": {
+        "type": "select",
+        "payload_key": "time"
+      },
+      "postcondition": {
+        "type": "action_target_has_value",
+        "payload_key": "time"
+      },
+      "status": "stale",
+      "last_checked": null,
+      "last_error": null
+    },
+    "book.submit": {
+      "id": "book.submit",
+      "from_node": "booking_form",
+      "to_node": "booking_confirmation",
+      "target_description": "Submit the appointment booking form.",
+      "selector": {
+        "strategy": "css",
+        "value": "#book-appointment",
+        "original": {
+          "strategy": "css",
+          "value": "#book-appointment"
+        }
+      },
+      "relocation": {
+        "roles": [
+          "button"
+        ],
+        "names": [
+          "Book appointment",
+          "Schedule visit"
+        ],
+        "text": [
+          "Book appointment",
+          "Schedule visit"
+        ],
+        "test_ids": [
+          "book-appointment",
+          "schedule-visit"
+        ],
+        "alternate_selectors": [
+          {
+            "strategy": "css",
+            "value": "#schedule-visit"
+          },
+          {
+            "strategy": "css",
+            "value": "[data-action='submit-booking']"
+          },
+          {
+            "strategy": "css",
+            "value": "button[type='submit']"
+          }
+        ]
+      },
+      "action": {
+        "type": "click"
+      },
+      "postcondition": {
+        "type": "text_visible",
+        "values": [
+          "Appointment confirmed",
+          "Booking confirmed",
+          "Visit scheduled"
+        ],
+        "exact": false
+      },
+      "status": "stale",
+      "last_checked": null,
+      "last_error": null
+    },
+    "quote.open_quote": {
+      "id": "quote.open_quote",
+      "from_node": "home",
+      "to_node": "quote_form",
+      "target_description": "Open the quote request workflow.",
+      "selector": {
+        "strategy": "css",
+        "value": "#quote-nav",
+        "original": {
+          "strategy": "css",
+          "value": "#quote-nav"
+        }
+      },
+      "relocation": {
+        "roles": [
+          "button",
+          "link"
+        ],
+        "names": [
+          "Request quote",
+          "Get an estimate",
+          "Get quote",
+          "Quotes"
+        ],
+        "text": [
+          "Request quote",
+          "Get an estimate",
+          "Get quote"
+        ],
+        "test_ids": [
+          "quote-nav",
+          "estimate-nav"
+        ],
+        "alternate_selectors": [
+          {
+            "strategy": "css",
+            "value": "#estimate-nav"
+          },
+          {
+            "strategy": "css",
+            "value": "[data-skill='request_quote']"
+          },
+          {
+            "strategy": "css",
+            "value": "[data-action='request-quote']"
+          }
+        ]
+      },
+      "action": {
+        "type": "click"
+      },
+      "postcondition": {
+        "type": "any_selector_visible",
+        "selectors": [
+          {
+            "strategy": "css",
+            "value": "#quote-form"
+          },
+          {
+            "strategy": "css",
+            "value": "[data-flow='quote']"
+          },
+          {
+            "strategy": "label",
+            "value": "Company",
+            "exact": false
+          },
+          {
+            "strategy": "label",
+            "value": "Organization",
+            "exact": false
+          }
+        ]
+      },
+      "status": "stale",
+      "last_checked": null,
+      "last_error": null
+    },
+    "quote.fill_company": {
+      "id": "quote.fill_company",
+      "from_node": "quote_form",
+      "to_node": "quote_form",
+      "target_description": "Fill the company or customer identity field.",
+      "selector": {
+        "strategy": "css",
+        "value": "#company",
+        "original": {
+          "strategy": "css",
+          "value": "#company"
+        }
+      },
+      "relocation": {
+        "labels": [
+          "Company",
+          "Organization",
+          "Customer",
+          "Client"
+        ],
+        "placeholders": [
+          "Company",
+          "Organization",
+          "Customer",
+          "Client"
+        ],
+        "test_ids": [
+          "company",
+          "organization"
+        ],
+        "alternate_selectors": [
+          {
+            "strategy": "css",
+            "value": "#organization"
+          },
+          {
+            "strategy": "css",
+            "value": "input[name='organization']"
+          }
+        ]
+      },
+      "action": {
+        "type": "fill",
+        "payload_key": "company"
+      },
+      "postcondition": {
+        "type": "action_target_has_value",
+        "payload_key": "company"
+      },
+      "status": "stale",
+      "last_checked": null,
+      "last_error": null
+    },
+    "quote.choose_category": {
+      "id": "quote.choose_category",
+      "from_node": "quote_form",
+      "to_node": "quote_form",
+      "target_description": "Choose the quote request category.",
+      "selector": {
+        "strategy": "css",
+        "value": "#request-category",
+        "original": {
+          "strategy": "css",
+          "value": "#request-category"
+        }
+      },
+      "relocation": {
+        "labels": [
+          "Request category",
+          "Project type",
+          "Request type"
+        ],
+        "placeholders": [
+          "Request category",
+          "Project type",
+          "Request type"
+        ],
+        "test_ids": [
+          "request-category",
+          "project-type"
+        ],
+        "alternate_selectors": [
+          {
+            "strategy": "css",
+            "value": "#project-type"
+          },
+          {
+            "strategy": "css",
+            "value": "select[name='project-type']"
+          }
+        ]
+      },
+      "action": {
+        "type": "select",
+        "payload_key": "category"
+      },
+      "postcondition": {
+        "type": "action_completed"
+      },
+      "status": "stale",
+      "last_checked": null,
+      "last_error": null
+    },
+    "quote.fill_notes": {
+      "id": "quote.fill_notes",
+      "from_node": "quote_form",
+      "to_node": "quote_form",
+      "target_description": "Fill quote request notes.",
+      "selector": {
+        "strategy": "css",
+        "value": "#notes",
+        "original": {
+          "strategy": "css",
+          "value": "#notes"
+        }
+      },
+      "relocation": {
+        "labels": [
+          "Notes",
+          "Project notes",
+          "Project details",
+          "Details"
+        ],
+        "placeholders": [
+          "Notes",
+          "Project notes",
+          "Project details",
+          "Details"
+        ],
+        "test_ids": [
+          "notes",
+          "project-details"
+        ],
+        "alternate_selectors": [
+          {
+            "strategy": "css",
+            "value": "#project-details"
+          },
+          {
+            "strategy": "css",
+            "value": "textarea[name='project-details']"
+          }
+        ]
+      },
+      "action": {
+        "type": "fill",
+        "payload_key": "notes"
+      },
+      "postcondition": {
+        "type": "action_target_has_value",
+        "payload_key": "notes"
+      },
+      "status": "stale",
+      "last_checked": null,
+      "last_error": null
+    },
+    "quote.submit": {
+      "id": "quote.submit",
+      "from_node": "quote_form",
+      "to_node": "quote_confirmation",
+      "target_description": "Submit the quote request form.",
+      "selector": {
+        "strategy": "css",
+        "value": "#request-quote",
+        "original": {
+          "strategy": "css",
+          "value": "#request-quote"
+        }
+      },
+      "relocation": {
+        "roles": [
+          "button"
+        ],
+        "names": [
+          "Request quote",
+          "Send estimate request",
+          "Send request",
+          "Get an estimate"
+        ],
+        "text": [
+          "Request quote",
+          "Send estimate request",
+          "Send request",
+          "Get an estimate"
+        ],
+        "test_ids": [
+          "request-quote",
+          "send-estimate"
+        ],
+        "alternate_selectors": [
+          {
+            "strategy": "css",
+            "value": "#send-estimate"
+          },
+          {
+            "strategy": "css",
+            "value": "[data-action='submit-quote']"
+          },
+          {
+            "strategy": "css",
+            "value": "button[type='submit']"
+          }
+        ]
+      },
+      "action": {
+        "type": "click"
+      },
+      "postcondition": {
+        "type": "text_visible",
+        "values": [
+          "Quote request received",
+          "Quote received",
+          "Estimate request received"
+        ],
+        "exact": false
+      },
+      "status": "stale",
+      "last_checked": null,
+      "last_error": null
+    }
+  },
+  "skills": {
+    "book_appointment": {
+      "name": "book_appointment",
+      "description": "Book a customer appointment through the local target app.",
+      "payload_schema": {
+        "type": "object",
+        "additional_properties": false,
+        "required": [
+          "customer_name",
+          "service",
+          "date",
+          "time"
+        ],
+        "properties": {
+          "customer_name": {
+            "type": "string",
+            "min_length": 1
+          },
+          "service": {
+            "type": "string",
+            "min_length": 1
+          },
+          "date": {
+            "type": "string",
+            "min_length": 1,
+            "format": "yyyy-mm-dd"
+          },
+          "time": {
+            "type": "string",
+            "min_length": 1,
+            "format": "hh:mm"
+          }
+        }
+      },
+      "edges": [
+        "book.open_booking",
+        "book.fill_customer_name",
+        "book.choose_service",
+        "book.choose_date",
+        "book.choose_time",
+        "book.submit"
+      ],
+      "success": {
+        "confirmation_texts": [
+          "Appointment confirmed",
+          "Booking confirmed",
+          "Visit scheduled"
+        ]
+      }
+    },
+    "request_quote": {
+      "name": "request_quote",
+      "description": "Submit a quote request through the local target app.",
+      "payload_schema": {
+        "type": "object",
+        "additional_properties": false,
+        "required": [
+          "company",
+          "category",
+          "notes"
+        ],
+        "properties": {
+          "company": {
+            "type": "string",
+            "min_length": 1
+          },
+          "category": {
+            "type": "string",
+            "min_length": 1
+          },
+          "notes": {
+            "type": "string",
+            "min_length": 1
+          }
+        }
+      },
+      "edges": [
+        "quote.open_quote",
+        "quote.fill_company",
+        "quote.choose_category",
+        "quote.fill_notes",
+        "quote.submit"
+      ],
+      "success": {
+        "confirmation_texts": [
+          "Quote request received",
+          "Quote received",
+          "Estimate request received"
+        ]
+      }
+    }
+  }
+}
