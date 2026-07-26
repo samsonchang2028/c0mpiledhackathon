@@ -155,8 +155,8 @@
           }
         ]
       },
-      "status": "stale",
-      "last_checked": null,
+      "status": "verified",
+      "last_checked": "2026-07-26T04:09:28Z",
       "last_error": null
     },
     "book.fill_customer_name": {
@@ -206,8 +206,8 @@
         "type": "action_target_has_value",
         "payload_key": "customer_name"
       },
-      "status": "stale",
-      "last_checked": null,
+      "status": "verified",
+      "last_checked": "2026-07-26T04:09:28Z",
       "last_error": null
     },
     "book.choose_service": {
@@ -256,8 +256,8 @@
       "postcondition": {
         "type": "action_completed"
       },
-      "status": "stale",
-      "last_checked": null,
+      "status": "verified",
+      "last_checked": "2026-07-26T04:09:28Z",
       "last_error": null
     },
     "book.choose_date": {
@@ -307,8 +307,8 @@
         "type": "action_target_has_value",
         "payload_key": "date"
       },
-      "status": "stale",
-      "last_checked": null,
+      "status": "verified",
+      "last_checked": "2026-07-26T04:09:28Z",
       "last_error": null
     },
     "book.choose_time": {
@@ -358,8 +358,8 @@
         "type": "action_target_has_value",
         "payload_key": "time"
       },
-      "status": "stale",
-      "last_checked": null,
+      "status": "verified",
+      "last_checked": "2026-07-26T04:09:31Z",
       "last_error": null
     },
     "book.submit": {
@@ -418,8 +418,8 @@
         ],
         "exact": false
       },
-      "status": "stale",
-      "last_checked": null,
+      "status": "verified",
+      "last_checked": "2026-07-26T04:09:31Z",
       "last_error": null
     },
     "quote.open_quote": {
